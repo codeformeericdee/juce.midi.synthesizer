@@ -26,6 +26,8 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock, int outputChannels);
 private:
 
+    juce::AudioBuffer<float> double_buffer;
+
     juce::dsp::Gain<float> float_gain_1;
 
     /* Declares an oscillator class that is set to operate on float values

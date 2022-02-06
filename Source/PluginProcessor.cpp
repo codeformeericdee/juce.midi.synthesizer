@@ -19,7 +19,7 @@ Juce_midi_synthesizerAudioProcessor::Juce_midi_synthesizerAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), value_tree_state (*this, nullptr, "Parameters", createParams())
 #endif
 {
     /* Sound and voice de-references are handled by the Synthesizer class */
@@ -29,6 +29,20 @@ Juce_midi_synthesizerAudioProcessor::Juce_midi_synthesizerAudioProcessor()
 
 Juce_midi_synthesizerAudioProcessor::~Juce_midi_synthesizerAudioProcessor()
 {
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout Juce_midi_synthesizerAudioProcessor::createParams()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> oscillator_parameters;
+
+    oscillator_parameters.push_back(std::make_unique<juce::AudioParameterChoice>("osci", "Oscillator", juce::StringArray{ "Square", "Saw", "Sine" }, 0));
+
+    oscillator_parameters.push_back(std::make_unique<juce::AudioParameterFloat>("atta", "Attack",  juce::NormalisableRange<float> {0.1f, 1.0f}, 0.1f));
+    oscillator_parameters.push_back(std::make_unique<juce::AudioParameterFloat>("deca", "Decay",   juce::NormalisableRange<float> {0.1f, 1.0f}, 0.1f));
+    oscillator_parameters.push_back(std::make_unique<juce::AudioParameterFloat>("sust", "Sustain", juce::NormalisableRange<float> {0.1f, 1.0f}, 1.0f));
+    oscillator_parameters.push_back(std::make_unique<juce::AudioParameterFloat>("rele", "Release", juce::NormalisableRange<float> {0.1f, 4.0f}, 0.4f));
+    
+    return { oscillator_parameters.begin(), oscillator_parameters.end()  };
 }
 
 //==============================================================================
@@ -157,6 +171,10 @@ void Juce_midi_synthesizerAudioProcessor::processBlock (juce::AudioBuffer<float>
 
     int startSample = 0;
     synthesizer.renderNextBlock(buffer, midiMessages, startSample, buffer.getNumSamples());
+
+    for (const juce::MidiMessageMetadata metadata : midiMessages)
+        if (metadata.numBytes == 3)
+            juce::Logger::writeToLog("Time stamp: " + juce::String(metadata.getMessage().getTimeStamp()));
 
 }
 

@@ -16,6 +16,15 @@ Juce_midi_synthesizerAudioProcessorEditor::Juce_midi_synthesizerAudioProcessorEd
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    using ValueTreeState_SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+
+    this->attack_attachment  = std::make_unique<ValueTreeState_SliderAttachment>(this->audioProcessor.value_tree_state, "atta", this->attack_slider);
+    this->decay_attachment   = std::make_unique<ValueTreeState_SliderAttachment>(this->audioProcessor.value_tree_state, "deca", this->decay_slider);
+    this->sustain_attachment = std::make_unique<ValueTreeState_SliderAttachment>(this->audioProcessor.value_tree_state, "sust", this->sustain_slider);
+    this->release_attachment = std::make_unique<ValueTreeState_SliderAttachment>(this->audioProcessor.value_tree_state, "rele", this->release_slider);
+
+    this->wave_selector = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(this->audioProcessor.value_tree_state, "osci", this->wave_selection);
 }
 
 Juce_midi_synthesizerAudioProcessorEditor::~Juce_midi_synthesizerAudioProcessorEditor()
